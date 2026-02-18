@@ -10,9 +10,33 @@
 		BE4EE4F42D86168E00711AA4 /* Rainify.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Rainify.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		BEB4F10C2F465913003BA89B /* Exceptions for "Rainify" folder in "Rainify" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Utilities/.gitignore,
+			);
+			target = BE4EE4F32D86168E00711AA4 /* Rainify */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		BEB4F10D2F465913003BA89B /* Exceptions for "Rainify" folder in "Compile Sources" phase from "Rainify" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = BE4EE4F02D86168E00711AA4 /* Sources */;
+			membershipExceptions = (
+				Utilities/.gitignore,
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		BE4EE4F62D86168E00711AA4 /* Rainify */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				BEB4F10C2F465913003BA89B /* Exceptions for "Rainify" folder in "Rainify" target */,
+				BEB4F10D2F465913003BA89B /* Exceptions for "Rainify" folder in "Compile Sources" phase from "Rainify" target */,
+			);
 			path = Rainify;
 			sourceTree = "<group>";
 		};
