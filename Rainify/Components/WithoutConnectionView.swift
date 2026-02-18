@@ -22,7 +22,6 @@ struct WithoutConnectionView: View {
                 .foregroundColor(.theme.secondary)
                 
         }
-//        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 

@@ -8,30 +8,7 @@
 import SwiftUI
 import CoreLocation
 
-struct showTesting: View {
-    @State var showPopup: Bool = true
-    
-    var body : some View {
-        VStack {
-            Text("hello world!!")
-        }
-        .sheet(isPresented: $showPopup) {
-            Testing(
-                state: .authorizedWhenInUse,
-                requestPermission: { print("Mock") }
-            )
-            .presentationDetents([.fraction(0.25)])
-        }
-    }
-}
-
-#Preview {
-    showTesting()
-}
-
-
-
-struct Testing: View {
+struct RequestPermissionView: View {
     let state: CLAuthorizationStatus
     let requestPermission: () -> Void
     
@@ -79,18 +56,18 @@ struct Testing: View {
     private var message: String {
         switch state {
         case .denied, .restricted:
-            "Activa la ubicación desde Ajustes para usar la app."
+            "Enable location in Settings to use the app."
         default:
-            "Permite tu ubicación para mostrar el clima local."
+            "Allow your location to display the local weather."
         }
     }
     
     private var buttonTitle: String {
         switch state {
         case .denied, .restricted:
-            "Abrir Ajustes"
+            "Open Settings"
         default:
-            "Permitir ubicación"
+            "Allow Location"
         }
     }
     
@@ -108,7 +85,7 @@ struct Testing: View {
 }
 
 #Preview {
-    Testing(state: .authorizedWhenInUse, requestPermission: {
-        print("Mock: solicitar permiso")
+    RequestPermissionView(state: .authorizedWhenInUse, requestPermission: {
+        print("Mock: allow permission")
     })
 }

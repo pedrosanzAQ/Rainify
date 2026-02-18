@@ -36,7 +36,7 @@ struct WelcomeView: View {
                 .padding(.top, 8)
         }
         .sheet(isPresented: $viewmodel.showPopup) {
-            Testing(state: viewmodel.authorizationStatus, requestPermission: {
+            RequestPermissionView(state: viewmodel.authorizationStatus, requestPermission: {
                 viewmodel.requestLocationPermission()
             })
             .presentationDetents([.fraction(0.25)])
@@ -89,7 +89,8 @@ private var policySection: some View {
 @MainActor
 class WelcomeViewModel {
     // observables
-    let realtimeManager: RealTimeManager
+//    let realtimeManager: RealTimeManager
+    let realtimeManager: MockRealTimeManager
     let locationManager: LocationsPersistenceManager
     let weatherManager: WeatherManager
     
@@ -98,7 +99,8 @@ class WelcomeViewModel {
     
     
     init(container: DependencyContainer, onFinished: @escaping () -> Void) {
-        self.realtimeManager = container.resolve(RealTimeManager.self)!
+//        self.realtimeManager = container.resolve(RealTimeManager.self)!
+        self.realtimeManager = container.resolve(MockRealTimeManager.self)!
         self.locationManager = container.resolve(LocationsPersistenceManager.self)!
         self.weatherManager = container.resolve(WeatherManager.self)!
         self.onFinished = onFinished
@@ -142,10 +144,6 @@ class WelcomeViewModel {
 }
 
 #Preview {
-    GeometryReader { geo in 
-        WelcomeView(viewmodel: WelcomeViewModel(container: DevPreview.shared.container) {
-            
-        })
-    }
+    WelcomeView(viewmodel: WelcomeViewModel(container: DevPreview.shared.container) { })
 }
 

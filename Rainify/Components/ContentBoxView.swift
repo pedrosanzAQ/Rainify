@@ -28,10 +28,6 @@ struct ContentBoxView<Content: View>: View {
                 .background(
                     isOverlayStyle ?
                     AnyView(specialBackground) :
-//                    AnyView(
-//                        Color(.secondarySystemBackground)
-//                            .opacity(colorScheme == .dark ? 0.18 : 1)
-//                    )
                     AnyView(Color.white.opacity(colorScheme == .dark ? 0.03 : 1))
                 )
                 .cornerRadius(16)
@@ -44,7 +40,6 @@ struct ContentBoxView<Content: View>: View {
                             lineWidth: 1
                         )
                 )
-//                .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
                 .shadow(
                     color: colorScheme == .dark ?
                         Color.white.opacity(0.20):
@@ -69,7 +64,6 @@ struct ContentBoxView<Content: View>: View {
                         .font(.caption)
                         .padding(.trailing, 10)
                         .padding(.vertical, 4)
-//                        .background(Color(.systemBackground))
                         .cornerRadius(8)
                 }
             }
@@ -77,13 +71,11 @@ struct ContentBoxView<Content: View>: View {
                 Rectangle()
                     .stroke(Color.gray.opacity(0.3), lineWidth: 0)
             )
-//            .offset(x: 15, y: -10)
-            .padding(.leading, 15)   // ← reemplaza el offset en X
+            .padding(.leading, 15)
             .padding(.top, -8)
 
             
         }
-//        .padding(.top, 10) // Espacio superior para que el título no se corte
     }
     
     var specialBackground: some View {
