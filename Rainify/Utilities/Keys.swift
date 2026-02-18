@@ -6,6 +6,6 @@
 //
 
 struct Keys {
-    let WeatherApiKey = Config.apiKey
+    static let WeatherApiKey = Config.apiKey
     static let weatherULR = "https://api.weatherapi.com/v1"
 }

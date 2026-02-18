@@ -14,11 +14,9 @@ struct RainifyApp: App {
 
     var body: some Scene {
         WindowGroup {
-            // Esperamos a que AppDelegate cree las dependencias
             if let container = appDelegate.dependencies?.container {
                 AppView(viewmodel: AppViewModel(container: container))
             } else {
-                // Pantalla vacía ultra breve al arrancar
                 ProgressView()
             }
         }
@@ -53,10 +51,8 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         return true
     }
 }
-// ------- DEPENDENCY CONTAINER ----------
-//       WHEN EVRY VIEW IS WORKING
 
-@Observable // it works whith de environment
+@Observable
 @MainActor
 class DependencyContainer {
     private var services: [String: Any] = [:]

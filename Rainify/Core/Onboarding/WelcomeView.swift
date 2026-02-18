@@ -89,8 +89,7 @@ private var policySection: some View {
 @MainActor
 class WelcomeViewModel {
     // observables
-    let realtimeManager: MockRealTimeManager
-//    let realtimeManager: RealTimeManager
+    let realtimeManager: RealTimeManager
     let locationManager: LocationsPersistenceManager
     let weatherManager: WeatherManager
     
@@ -99,8 +98,7 @@ class WelcomeViewModel {
     
     
     init(container: DependencyContainer, onFinished: @escaping () -> Void) {
-//        self.realtimeManager = container.resolve(RealTimeManager.self)!
-        self.realtimeManager = container.resolve(MockRealTimeManager.self)!
+        self.realtimeManager = container.resolve(RealTimeManager.self)!
         self.locationManager = container.resolve(LocationsPersistenceManager.self)!
         self.weatherManager = container.resolve(WeatherManager.self)!
         self.onFinished = onFinished
@@ -115,7 +113,6 @@ class WelcomeViewModel {
     }
     
     func requestLocationPermission() {
-//        print("permission requested")
         realtimeManager.requestPermission()
     }
     
@@ -127,19 +124,9 @@ class WelcomeViewModel {
         }
         
         showPopup = false
-//        isLoading.wrappedValue = true
-        
-//        try? await Task.sleep(for: .milliseconds(350))
-//        do {
-            await saveCurrentLocation()
+        await saveCurrentLocation()
         print("saveCurrentLocation")
-//            showTabBar.wrappedValue = true
-//        } catch {
-//            print(error.localizedDescription)
-//        }
-//        
         onFinished()
-//        isLoading.wrappedValue = false
     }
     
     private func saveCurrentLocation() async {
