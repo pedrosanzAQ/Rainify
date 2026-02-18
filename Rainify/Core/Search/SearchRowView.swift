@@ -28,8 +28,6 @@ struct SearchRowView: View {
         self.lowTemp = weather?.forecast.forecastday.first?.day.mintempC
         self.condition = weather?.current.condition.text
         self.hour = weather?.current.lastUpdated
-        
-        // Precalcula una sola vez
         self.backgroundGradient = SearchRowView.makeGradient(hour: hour ?? "00:00")
     }
     
@@ -66,7 +64,6 @@ struct SearchRowView: View {
         }
         .padding(12)
         .frame(height: 110)
-//        .background(Color.blue)
         .background(backgroundGradient, in: RoundedRectangle(cornerRadius: 14))
         .cornerRadius(14)
     }
