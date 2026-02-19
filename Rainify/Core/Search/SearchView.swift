@@ -114,7 +114,7 @@ struct SearchView: View {
         .searchable(
             text: $viewmodel.searchText,
             placement: .navigationBarDrawer(displayMode: .always),
-            prompt: "Buscar algo"
+            prompt: "Search city"
         )
         {
             searchSuggestionsView

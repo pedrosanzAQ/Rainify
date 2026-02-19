@@ -178,6 +178,7 @@ struct LocationView: View {
                             AstroConditionView(viewmodel: AstroConditionViewModel(forecastdays: viewmodel.forecastday ?? []))
                         }
                         .padding(.horizontal)
+                        .padding(.bottom, 80)
                     }
 //                    .padding(.top, 80)
                 }
