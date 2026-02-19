@@ -10,15 +10,79 @@ import CoreLocation
 
 @Observable
 @MainActor
-class RealTimeManager: NSObject, @preconcurrency CLLocationManagerDelegate {
+class RealTimeManager {
     
-    private let manager = CLLocationManager()
+    private let service: LocationService
+    
+    var authorizationStatus: CLAuthorizationStatus = .notDetermined
+    var currentLocation: CLLocation?
+    
+    
+    init(service: LocationService) {
+        self.service = service
+        
+        self.authorizationStatus = service.authorizationStatus
+        self.currentLocation = service.currentLocation
+    }
+    
+    func requestPermission() {
+        service.requestPermission()
+
+    }
+    
+    func refreshLocation() {
+        service.requestLocation()
+    }
+}
+
+
+@MainActor
+protocol LocationService: AnyObject{
+    
+    var authorizationStatus: CLAuthorizationStatus { get }
+    var currentLocation: CLLocation? { get }
+    
+    func requestPermission()
+    func requestLocation()
+}
+
+@Observable
+final class MockRealTimeService: LocationService {
     
     var authorizationStatus: CLAuthorizationStatus
     var currentLocation: CLLocation?
     
+    init(
+        authorizationStatus: CLAuthorizationStatus = .notDetermined,
+        currentLocation: CLLocation? = nil
+    ) {
+        self.authorizationStatus = authorizationStatus
+        self.currentLocation = currentLocation
+    }
+    
+    
+    func requestPermission() {
+        authorizationStatus = .authorizedWhenInUse
+        currentLocation = CLLocation(latitude: 19.4326, longitude: -99.1332)
+    }
+    
+    func requestLocation() {
+    }
+}
+
+
+import CoreLocation
+
+@Observable
+final class RealTimeService: NSObject, LocationService, @MainActor CLLocationManagerDelegate {
+    
+    private let manager = CLLocationManager()
+    
+    private(set) var authorizationStatus: CLAuthorizationStatus
+    private(set) var currentLocation: CLLocation?
+    
     override init() {
-        authorizationStatus = manager.authorizationStatus
+        self.authorizationStatus = manager.authorizationStatus
         super.init()
         manager.delegate = self
         manager.desiredAccuracy = kCLLocationAccuracyBest
@@ -28,12 +92,18 @@ class RealTimeManager: NSObject, @preconcurrency CLLocationManagerDelegate {
         manager.requestWhenInUseAuthorization()
     }
     
+    func requestLocation() {
+        manager.requestLocation()
+    }
+    
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        authorizationStatus = manager.authorizationStatus
-        
-        if authorizationStatus == .authorizedWhenInUse ||
-            authorizationStatus == .authorizedAlways {
-            manager.requestLocation()
+        Task { @MainActor in
+            authorizationStatus = manager.authorizationStatus
+            
+            if authorizationStatus == .authorizedWhenInUse ||
+                authorizationStatus == .authorizedAlways {
+                requestLocation()
+            }
         }
     }
     
@@ -41,35 +111,18 @@ class RealTimeManager: NSObject, @preconcurrency CLLocationManagerDelegate {
         _ manager: CLLocationManager,
         didUpdateLocations locations: [CLLocation]
     ) {
-        currentLocation = locations.first
+        Task { @MainActor in
+            self.currentLocation = locations.first
+        }
     }
     
     func locationManager(
         _ manager: CLLocationManager,
         didFailWithError error: Error
     ) {
-        print("Location error:", error)
-    }
-}
-
-@Observable
-final class MockRealTimeManager {
-    
-    var authorizationStatus: CLAuthorizationStatus
-    var currentLocation: CLLocation?
-    
-    init(
-        authorizationStatus: CLAuthorizationStatus,
-        currentLocation: CLLocation? = nil
-    ) {
-        self.authorizationStatus = authorizationStatus
-        self.currentLocation = currentLocation
-    }
-    
-    func requestPermission() {
-        // Simulamos que el usuario acepta
-        authorizationStatus = .authorizedAlways
-        
-        currentLocation = CLLocation(latitude: 19.4326, longitude: -99.1332)
+        Task { @MainActor in
+            print("Location error:", error.localizedDescription)
+            self.currentLocation = nil
+        }
     }
 }

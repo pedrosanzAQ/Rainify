@@ -89,8 +89,8 @@ private var policySection: some View {
 @MainActor
 class WelcomeViewModel {
     // observables
-//    let realtimeManager: RealTimeManager
-    let realtimeManager: MockRealTimeManager
+    let realtimeManager: RealTimeManager
+//    let realtimeManager: MockRealTimeManager
     let locationManager: LocationsPersistenceManager
     let weatherManager: WeatherManager
     
@@ -99,8 +99,8 @@ class WelcomeViewModel {
     
     
     init(container: DependencyContainer, onFinished: @escaping () -> Void) {
-//        self.realtimeManager = container.resolve(RealTimeManager.self)!
-        self.realtimeManager = container.resolve(MockRealTimeManager.self)!
+        self.realtimeManager = container.resolve(RealTimeManager.self)!
+//        self.realtimeManager = container.resolve(MockRealTimeManager.self)!
         self.locationManager = container.resolve(LocationsPersistenceManager.self)!
         self.weatherManager = container.resolve(WeatherManager.self)!
         self.onFinished = onFinished
@@ -132,13 +132,9 @@ class WelcomeViewModel {
     }
     
     private func saveCurrentLocation() async {
-        print("entre a la funcion")
         guard let response = realtimeManager.currentLocation else { return }
-        print("tengo el response")
         guard let location = try? await weatherManager.getCurrentLocation(lat: response.coordinate.latitude, lon: response.coordinate.longitude) else { return }
-        print("tengo la localizacion")
         locationManager.addFavorites(location: location)
-        print("guarde en favs")
         await weatherManager.loadWeather(locationId: location.id, lat: location.lat, lon: location.long)
     }
 }

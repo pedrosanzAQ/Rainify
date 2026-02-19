@@ -111,6 +111,21 @@ struct SearchView: View {
         }
         .navigationTitle("Search")
         .navigationBarTitleDisplayMode(.large)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Menu {
+                    Button("Edit favorites") {
+                        // acción
+                    }
+                    
+                    Button("Edit favorites") {
+                        // acción
+                    }
+                } label: {
+                    Image(systemName: "ellipsis")
+                }
+            }
+        }
         .searchable(
             text: $viewmodel.searchText,
             placement: .navigationBarDrawer(displayMode: .always),

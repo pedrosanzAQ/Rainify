@@ -78,7 +78,7 @@ struct Dependencies {
     init() {
         self.weatherManager = WeatherManager(weatherService: APIWeatherService(), cachedService: LocalCachedWeatherPersistence())
         self.locationManager = LocationsPersistenceManager(service: LocalLocationPersistenceService())
-        self.realTimeManager = RealTimeManager()
+        self.realTimeManager = RealTimeManager(service: RealTimeService())
         
         let container = DependencyContainer()
         container.register(WeatherManager.self, service: weatherManager)
@@ -96,17 +96,17 @@ class DevPreview {
     let container: DependencyContainer
     let weatherManager: WeatherManager
     let locationManager: LocationsPersistenceManager
-    let mockRealTimeManager: MockRealTimeManager
+    let mockRealTimeManager: RealTimeManager
     
     init() {
         self.weatherManager = WeatherManager(weatherService: MockWeatherService(), cachedService: MockCachedWeatherPersistence())
         self.locationManager = LocationsPersistenceManager(service: MockLocationsPersistenceService())
-        self.mockRealTimeManager = MockRealTimeManager(authorizationStatus: .authorizedWhenInUse)
+        self.mockRealTimeManager = RealTimeManager(service: MockRealTimeService())
         
         let container = DependencyContainer()
         container.register(WeatherManager.self, service: weatherManager)
         container.register(LocationsPersistenceManager.self, service: locationManager)
-        container.register(MockRealTimeManager.self, service: mockRealTimeManager)
+        container.register(RealTimeManager.self, service: mockRealTimeManager)
         self.container = container
     }
 }
