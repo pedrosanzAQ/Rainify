@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct HourlyForecastView: View {
+    @Environment(AppSettings.self) private var appSettings
     var viewModel: HourlyForecastViewModel
     
     var body: some View {
@@ -43,7 +44,7 @@ struct HourlyForecastView: View {
                                     }
                                 }
                                 
-                                Text(String(format: "%.0f°C", hour.tempC))
+                                Text("\(appSettings.setTemperature(temp: hour.tempF))")
                                     .font(.subheadline)
                                     .fontWeight(.semibold)
                                     .foregroundColor(.theme.dinamicText)
@@ -54,8 +55,6 @@ struct HourlyForecastView: View {
                     .frame(height: 80)
                     .padding(.vertical, 6)
                 }
-//                .frame(height: 80)
-//                .padding(.vertical, 6)
             } else {
                 WithoutConnectionView()
                     .frame(height: 80)
@@ -63,7 +62,6 @@ struct HourlyForecastView: View {
                     .padding(.vertical, 6)
             }
         }
-//        .padding(.horizontal)
     }
 }
 
@@ -108,37 +106,22 @@ class HourlyForecastViewModel {
         }
         
     }
-    
-    // return apple icon system acording the timeCondition
-    // checar si es de dia mostrar con sol, sino con luna
-    // checar cuando se va la luna para poner el simbolo normal
-    
-    // sun.max.fill     --- 113
-    // cloud.sun.fill   --- 116
-    // cloud.fill       --- 119, 122
-    // cloud.fog.fill   --- 143
-    // cloud.rain.fill  --- 176
-    //
-    
-//    func icon(for hour: Current) -> String {
-//        switch hour.condition.text.lowercased() {
-//            case
-//        }
-//        return ""
-//    }
 }
 
 
 #Preview("Data"){
+    let appSettings = AppSettings()
     if let weather = Bundle.main.decode("MockWeatherResponse.json") as WeatherResponse? {
         let mockForecast = weather.forecast.forecastday
-//        let mockHours = weather.forecast.forecastday.first?.hour ?? []
         HourlyForecastView(viewModel: HourlyForecastViewModel(forecast: mockForecast))
+            .environment(appSettings)
     }
 }
 
 #Preview("NoData") {
+    let appSettings = AppSettings()
     HourlyForecastView(viewModel: HourlyForecastViewModel(forecast: []))
+        .environment(appSettings)
 }
 
 

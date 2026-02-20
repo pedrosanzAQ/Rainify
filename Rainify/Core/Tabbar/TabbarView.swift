@@ -18,9 +18,9 @@ struct TabbarView: View {
             .tabItem ({ Image(systemName: "smoke") })
             .tag(TypeBar.weather)
             
-            NavigationStack {
+//            NavigationStack {
                 SearchView(viewmodel: SearchViewModel(container: viewmodel.container))
-            }
+//            }
             .tabItem ({ Image(systemName: "magnifyingglass") })
             .tag(TypeBar.search)
         }

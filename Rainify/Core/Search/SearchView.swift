@@ -101,49 +101,91 @@ class SearchViewModel {
 
 struct SearchView: View {
     @Environment(TabbarViewModel.self) private var tabBarViewModel
+    @Environment(AppSettings.self) private var appSettings
     @State var viewmodel: SearchViewModel
     @State private var selectedLocation: StoredLocation? = nil
     @State private var selectedSuggestion: StoredLocation? = nil
+    @State private var showMenu = false
+    @FocusState private var isSearching: Bool
     
     var body: some View {
+        
         ZStack {
-            favoritesView
-        }
-        .navigationTitle("Search")
-        .navigationBarTitleDisplayMode(.large)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Menu {
-                    Button("Edit favorites") {
-                        // acción
+            NavigationStack {
+                ZStack(alignment: .topTrailing){
+                    favoritesView
+                }
+                .navigationTitle("Search")
+                .navigationBarTitleDisplayMode(.large)
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button {
+                            showMenu.toggle()
+                        } label: {
+                            Image(systemName: "ellipsis")
+                        }
                     }
-                    
-                    Button("Edit favorites") {
-                        // acción
+                }
+                .searchable(
+                    text: $viewmodel.searchText,
+                    placement: .navigationBarDrawer(displayMode: .always),
+                    prompt: "Search city"
+                )
+                {
+                    searchSuggestionsView
+                }
+                .onTapGesture {
+                    if showMenu {
+                        closeMenu()
                     }
-                } label: {
-                    Image(systemName: "ellipsis")
+                }
+                .sheet(item: $selectedSuggestion) { location in
+                    suggestionSheet(location)
+                }
+                .onChange(of: selectedSuggestion) { _, newValue in
+                    if newValue == nil {
+                        viewmodel.clearSearch()
+                    }
+                }
+                .onChange(of: viewmodel.searchText) { _, _ in
+                    if showMenu {
+                        closeMenu()
+                    }
+                }
+                .simultaneousGesture(
+                    TapGesture().onEnded {
+                        if showMenu {
+                            closeMenu()
+                        }
+                    }
+                )
+            }
+            .onDisappear {
+                if showMenu {
+                    closeMenu()
                 }
             }
         }
-        .searchable(
-            text: $viewmodel.searchText,
-            placement: .navigationBarDrawer(displayMode: .always),
-            prompt: "Search city"
-        )
-        {
-            searchSuggestionsView
-        }
-        .sheet(item: $selectedSuggestion) { location in
-            suggestionSheet(location)
-        }
-        .onChange(of: selectedSuggestion) { _, newValue in
-            if newValue == nil {
-                viewmodel.clearSearch()
+        .overlay(alignment: .topTrailing) {
+            if showMenu {
+                ZStack(alignment: .topTrailing) {
+                    SearchMenuActionView(onChangeUnit: {
+                        appSettings.temperatureToggle()
+                    })
+                    .padding(.top, 60)
+                    .padding(.trailing, 20)
+                    .transition(.scale.combined(with: .opacity))
+                }
+                .zIndex(100)
             }
         }
     }
 
+    private func closeMenu() {
+        withAnimation(.easeInOut(duration: 0.2)) {
+            showMenu = false
+        }
+    }
     
     // subviews
     @ViewBuilder
@@ -161,9 +203,17 @@ struct SearchView: View {
                 }
                 .id("favorites-section")
             }
+            .simultaneousGesture(
+                DragGesture().onChanged { _ in
+                    if showMenu {
+                        closeMenu()
+                    }
+                }
+            )
             .scrollContentBackground(.hidden)
             .scrollIndicators(.hidden)
             .background(Color.clear)
+            
         } else {
             emptyFavoritesView
         }
@@ -294,7 +344,8 @@ struct SearchView: View {
 #Preview("cacheData"){
     let container = DevPreview.shared.container
     let tabbarVM = TabbarViewModel(container: container)
-    NavigationStack {
+    let appSettings = AppSettings()
+//    NavigationStack {
         SearchView(viewmodel: SearchViewModel(container: container))
             .onAppear {
                 Task {
@@ -302,6 +353,7 @@ struct SearchView: View {
                     await DevPreview.shared.locationManager.loadPersistenceLocations()
                 }
             }
-    }
+//    }
     .environment(tabbarVM)
+    .environment(appSettings)
 }

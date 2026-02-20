@@ -53,30 +53,30 @@ class LocationViewModel {
         return weatherResponse?.current.condition.text
     }
     
-    var temperatureC: String? {
-        guard let temp = weatherResponse?.current.tempC else { return nil }
-        return String(Int(temp.rounded()))
-    }
+//    var temperatureC: String? {
+//        guard let temp = weatherResponse?.current.tempC else { return nil }
+//        return String(Int(temp.rounded()))
+//    }
     
     var humidity: Int? {
         return weatherResponse?.current.humidity
     }
     
-    var feelsLikeC: String? {
-        guard let feelsLike = weatherResponse?.current.feelslikeC else { return nil}
-        return String(Int(feelsLike.rounded()))
-    }
+//    var feelsLikeC: String? {
+//        guard let feelsLike = weatherResponse?.current.feelslikeC else { return nil}
+//        return String(Int(feelsLike.rounded()))
+//    }
     
-    var lowTemperatureC: String?{
-        guard let minTemp = weatherResponse?.forecast.forecastday.first?.day.mintempC else { return nil}
-        return String(Int(minTemp.rounded()))
-    }
+//    var lowTemperatureC: String?{
+//        guard let minTemp = weatherResponse?.forecast.forecastday.first?.day.mintempC else { return nil}
+//        return String(Int(minTemp.rounded()))
+//    }
     
-    var highTemperatureC: String? {
-        guard let maxTemp = weatherResponse?.forecast.forecastday.first?.day.maxtempC else { return nil}
-        return String(Int(maxTemp.rounded()))
-    }
-    
+//    var highTemperatureC: String? {
+//        guard let maxTemp = weatherResponse?.forecast.forecastday.first?.day.maxtempC else { return nil}
+//        return String(Int(maxTemp.rounded()))
+//    }
+//    
     func toggleFavorite() {
         if isPinned {
             locationsManager.removeFavorites(location: location)
@@ -90,6 +90,7 @@ class LocationViewModel {
 // keywords C679DD
 struct LocationView: View {
     @Environment(\.safeAreaInsets) var safeArea
+    @Environment(AppSettings.self) private var appSettings
     let width = UIScreen.main.bounds.width
     @State var clouds: CloudScenes?
     @State var scrollOffset: CGFloat = 0
@@ -104,7 +105,6 @@ struct LocationView: View {
                 WeatherBackground(scene: clouds.bigScene)
                     .frame(maxWidth: UIScreen.main.bounds.width)
                     .frame(height: 550)
-//                    .ignoresSafeArea(edges: .top)
             }
             
             ScrollView {
@@ -213,7 +213,6 @@ struct LocationView: View {
         }
 //        .padding(.top, 59)  // QUITAR
         .ignoresSafeArea()
-//        .padding(.top, safeArea.top)
         .task {
             self.clouds = CloudScenes()
         }
@@ -244,13 +243,16 @@ struct LocationView: View {
 // 9F7CEA morado actual
 
 #Preview ("Data"){
+    let appSettings = AppSettings()
     if let weatherResponse = Bundle.main.decode("MockWeatherResponse.json") as WeatherResponse? {
             LocationView(viewmodel: LocationViewModel(location: StoredLocation.mock, weather: weatherResponse, container: DevPreview.shared.container), isSheetPresented: false)
+            .environment(appSettings)
     }
 }
 
 #Preview("NoData") {
-//    if let weatherResponse = Bundle.main.decode("MockWeatherResponse.json") as WeatherResponse? {
+    let appSettings = AppSettings()
     LocationView(viewmodel: LocationViewModel(location: StoredLocation.mock, weather: nil, container: DevPreview.shared.container))
-//    }
+        .environment(appSettings)
+
 }

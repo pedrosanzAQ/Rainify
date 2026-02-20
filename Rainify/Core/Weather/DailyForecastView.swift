@@ -14,18 +14,6 @@ struct DailyForecastView: View {
         ContentBoxView(title: "10 Day Forecast") {
             if viewmodel.hasData {
                 VStack(spacing: 12){
-//                    ForEach (viewmodel.Forecastdays, id: \.date) { forecasteday in
-//                        WeatherDailyForecastRow(
-//                            day: forecasteday.date ,
-//                            iconURL: forecasteday.day.condition.iconURL,
-//                            chanceOfRain: forecasteday.day.dailyChanceOfRain,
-//                            highTemp: forecasteday.day.maxtempC,
-//                            lowTemp: forecasteday.day.mintempC
-//                        )
-//                        .background(Color.gray.opacity(0.3))
-//                        .cornerRadius(10)
-//                        .padding(.horizontal, -4)
-//                    }
                     ForEach(viewmodel.Forecastdays.indices, id: \.self) { index in
                         let forecasteday = viewmodel.Forecastdays[index]
                         
@@ -41,8 +29,8 @@ struct DailyForecastView: View {
                             day: dayString,
                             iconURL: forecasteday.day.condition.iconURL,
                             chanceOfRain: forecasteday.day.dailyChanceOfRain,
-                            highTemp: forecasteday.day.maxtempC,
-                            lowTemp: forecasteday.day.mintempC
+                            highTempF: forecasteday.day.maxtempF,
+                            lowTempF: forecasteday.day.mintempF
                         )
                         .background(Color.gray.opacity(0.3))
                         .cornerRadius(10)
@@ -64,8 +52,8 @@ struct DailyForecastView: View {
                                 day: weekday,   // <- YA RECIBE "Lun", "Mar", etc.
                                 iconURL: nil,
                                 chanceOfRain: nil,
-                                highTemp: nil,
-                                lowTemp: nil
+                                highTempF: nil,
+                                lowTempF: nil
                             )
                             .padding(8)
                             .background(Color.gray.opacity(0.4))
@@ -80,11 +68,12 @@ struct DailyForecastView: View {
 }
 
 struct WeatherDailyForecastRow: View {
+    @Environment(AppSettings.self) private var appSettings
     let day: String
     let iconURL: URL?
     let chanceOfRain: Int?
-    let highTemp: Double?
-    let lowTemp: Double?
+    let highTempF: Double?
+    let lowTempF: Double?
     
     var body: some View {
         HStack(spacing: 8){
@@ -124,8 +113,8 @@ struct WeatherDailyForecastRow: View {
             .padding(.trailing, 8)
             
             HStack(){
-                if let lowTemp = lowTemp {
-                    Text("\(Int(lowTemp))")
+                if let lowTemp = lowTempF {
+                    Text("\(appSettings.setIntTemperature(temp: lowTemp))")
                         .foregroundColor(.theme.dinamicText)
                         .font(.subheadline)
                         .fontWeight(.semibold)
@@ -140,8 +129,8 @@ struct WeatherDailyForecastRow: View {
                     .frame(height: 6)
                     .padding(.horizontal, 8)
                 
-                if let highTemp = highTemp {
-                    Text("\(Int(highTemp))")
+                if let highTemp = highTempF {
+                    Text("\(appSettings.setIntTemperature(temp: highTemp))")
                         .foregroundColor(.theme.dinamicText)
                         .font(.subheadline)
                         .fontWeight(.semibold)
@@ -152,9 +141,7 @@ struct WeatherDailyForecastRow: View {
                         .fontWeight(.semibold)
                 }
             }
-//            .frame(maxWidth: .infinity, alignment: .leading)
         }
-//        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal)
         .padding(.vertical, 1)
     }
@@ -173,13 +160,17 @@ class DailyForecastViewModel {
 }
 
 #Preview("MockData") {
+    let appSettings = AppSettings()
     if let weather = Bundle.main.decode("MockWeatherResponse.json") as WeatherResponse? {
         let mockForecastdays = weather.forecast.forecastday
         DailyForecastView(viewmodel: DailyForecastViewModel(forecastday: mockForecastdays))
             .padding(.horizontal)
+            .environment(appSettings)
     }
 }
 
 #Preview("NoData") {
+    let appSettings = AppSettings()
     DailyForecastView(viewmodel: DailyForecastViewModel(forecastday: []))
+        .environment(appSettings)
 }

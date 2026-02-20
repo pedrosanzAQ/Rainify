@@ -13,6 +13,7 @@ struct AppView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State var viewmodel: AppViewModel
     @State var appState: AppState = AppState()
+    @State var appSettings: AppSettings = AppSettings()
     
     var body: some View {
         GeometryReader { geo in
@@ -20,7 +21,10 @@ struct AppView: View {
                 if viewmodel.isAppReady {
                     AppViewBuilder(
                         showTabBar: appState.showTabBar,
-                        tabbarView: { TabbarView(viewmodel: TabbarViewModel(container: viewmodel.container)) },
+                        tabbarView: {
+                            TabbarView(viewmodel: TabbarViewModel(container: viewmodel.container))
+                                .environment(appSettings)
+                        },
                         onboardingView: {
                             WelcomeView(viewmodel: WelcomeViewModel(container: viewmodel.container, onFinished: {
                                 appState.updateViewState(showTabBarView: true)

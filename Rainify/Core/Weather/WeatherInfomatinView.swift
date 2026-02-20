@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct WeatherInformationView: View {
+    @Environment(AppSettings.self) private var appSettings
     let width = UIScreen.main.bounds.width
     var viewmodel: WeatherInformationViewModel
     
@@ -41,11 +42,7 @@ struct WeatherInformationView: View {
                 
                 VStack(spacing: 4) {
                     if viewmodel.hasData {
-                        HStack(spacing: 2) {
-                            Text(viewmodel.temperatureC ?? "0")
-                            
-                            Text("°C")
-                        }
+                        Text("\(appSettings.setTemperature(temp: viewmodel.temperatureF ?? 0))")
                         .font(.title2)
                         .fontWeight(.semibold)
                         
@@ -61,27 +58,20 @@ struct WeatherInformationView: View {
                         HStack(spacing: 4){
                             Image(systemName: "thermometer.low")
                             
-                            HStack(spacing: 2){
-                                Text(viewmodel.lowTemperatureC ?? "0°C")
+                            Text("\(appSettings.setTemperature(temp: viewmodel.lowTemperatureF ?? 0))")
                                 
-                                Text("°C")
-                            }
                         }
                         
                         HStack(spacing: 4){
                             Image(systemName: "thermometer.high")
                             
-                            HStack(spacing: 2){
-                                Text(viewmodel.highTemperatureC ?? "0°C")
+                            Text("\(appSettings.setTemperature(temp: viewmodel.highTemperatureF ?? 0))")
                                 
-                                Text("°C")
-                            }
                         }
                     }
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.top, -4)
-                //            .frame(width: width * 0.6)
                 
                 
                 VStack(spacing: 4) {
@@ -90,13 +80,9 @@ struct WeatherInformationView: View {
                         .fontWeight(.semibold)
                     Image(systemName: "thermometer.variable.and.figure")
                         .fontWeight(.semibold)
-//                    Text("28°C")
                     if viewmodel.hasData {
-                        HStack(spacing: 2){
-                            Text(viewmodel.feelsLikeC ?? "0")
+                    Text("\(appSettings.setTemperature(temp: viewmodel.feelsLikeF ?? 0))")
                             
-                            Text("°C")
-                        }
                     } else {
                         ProgressView()
                     }
@@ -130,42 +116,42 @@ class WeatherInformationViewModel {
         return weatherResponse?.current.condition.text
     }
     
-    var temperatureC: String? {
-        guard let temp = weatherResponse?.current.tempC else { return nil }
-        return String(Int(temp.rounded()))
+    var temperatureF: Double? {
+        guard let temp = weatherResponse?.current.tempF else { return nil }
+        return temp
     }
     
     var humidity: Int? {
         return weatherResponse?.current.humidity
     }
     
-    var feelsLikeC: String? {
-        guard let feelsLike = weatherResponse?.current.feelslikeC else { return nil}
-        return String(Int(feelsLike.rounded()))
+    var feelsLikeF: Double? {
+        guard let feelsLike = weatherResponse?.current.feelslikeF else { return nil}
+        return feelsLike
     }
     
-    var lowTemperatureC: String?{
-        guard let minTemp = weatherResponse?.forecast.forecastday.first?.day.mintempC else { return nil}
-        return String(Int(minTemp.rounded()))
+    var lowTemperatureF: Double?{
+        guard let minTemp = weatherResponse?.forecast.forecastday.first?.day.mintempF else { return nil}
+        return minTemp
     }
     
-    var highTemperatureC: String? {
-        guard let maxTemp = weatherResponse?.forecast.forecastday.first?.day.maxtempC else { return nil}
-        return String(Int(maxTemp.rounded()))
+    var highTemperatureF: Double? {
+        guard let maxTemp = weatherResponse?.forecast.forecastday.first?.day.maxtempF else { return nil}
+        return maxTemp
     }
 }
 
 #Preview("Data"){
+    let appSettings = AppSettings()
     if let weatherResponse = Bundle.main.decode("MockWeatherResponse.json") as WeatherResponse? {
         WeatherInformationView(viewmodel: WeatherInformationViewModel(weatherResponse: weatherResponse))
-            .background(Color.blue.opacity(0.5))
             .padding(.horizontal)
+            .environment(appSettings)
     }
 }
 
 #Preview("NoData"){
-//    if let weatherResponse = Bundle.main.decode("MockWeatherResponse.json") as WeatherResponse? {
+    let appSettings = AppSettings()
     WeatherInformationView(viewmodel: WeatherInformationViewModel(weatherResponse: nil))
-            .background(Color.blue.opacity(0.5))
-//    }
+        .environment(appSettings)
 }

@@ -8,11 +8,12 @@
 import SwiftUI
 
 struct SearchRowView: View {
+    @Environment(AppSettings.self) private var appSettings
     let weather: WeatherResponse?
     private let locationName: String?
-    private let temperature: Double?
-    private let highTemp: Double?
-    private let lowTemp: Double?
+    private let temperatureF: Double?
+    private let highTempF: Double?
+    private let lowTempF: Double?
     private let condition: String?
     private let hour: String?
     
@@ -23,9 +24,9 @@ struct SearchRowView: View {
     ) {
         self.weather = weather
         self.locationName = weather?.location.name
-        self.temperature = weather?.current.tempC
-        self.highTemp = weather?.forecast.forecastday.first?.day.maxtempC
-        self.lowTemp = weather?.forecast.forecastday.first?.day.mintempC
+        self.temperatureF = weather?.current.tempF
+        self.highTempF = weather?.forecast.forecastday.first?.day.maxtempF
+        self.lowTempF = weather?.forecast.forecastday.first?.day.mintempF
         self.condition = weather?.current.condition.text
         self.hour = weather?.current.lastUpdated
         self.backgroundGradient = SearchRowView.makeGradient(hour: hour ?? "00:00")
@@ -43,7 +44,7 @@ struct SearchRowView: View {
                
                Spacer()
                
-               Text("\(Int(temperature?.rounded() ?? 0))°C")
+               Text(appSettings.setTemperature(temp: temperatureF ?? 0))
                    .padding(.trailing)
                    .font(.title)
             }
@@ -55,8 +56,8 @@ struct SearchRowView: View {
                 Spacer()
                 
                 HStack(spacing: 8){
-                    Text("H:\(Int(highTemp?.rounded() ?? 0))°C")
-                    Text("L:\(Int(lowTemp?.rounded() ?? 0))°C")
+                    Text("H:\(appSettings.setTemperature(temp: highTempF ?? 0))")
+                    Text("L:\(appSettings.setTemperature(temp: lowTempF ?? 0))")
                 }
                 .padding(.trailing, 2)
             }
@@ -109,8 +110,12 @@ struct SearchRowView: View {
 }
 
 #Preview {
-    SearchRowView(weather: WeatherResponse.mock)
-        .padding(.horizontal)
-    SearchRowView(weather: WeatherResponse.mocks[2])
-        .padding(.horizontal)
+    let appSettings = AppSettings()
+    Group{
+        SearchRowView(weather: WeatherResponse.mock)
+            .padding(.horizontal)
+        SearchRowView(weather: WeatherResponse.mocks[2])
+            .padding(.horizontal)
+    }
+    .environment(appSettings)
 }

@@ -11,6 +11,7 @@ import SpriteKit
 // var voewmodel: WeatherInformationViewModel
 
 struct WeatherHeaderView: View {
+    @Environment(AppSettings.self) private var appSettings
     let progress: Double
     var viewmodel: WeatherInformationViewModel
     @State private var animateIn: Bool = false
@@ -28,12 +29,12 @@ struct WeatherHeaderView: View {
                     Text("|")
                         .padding(.horizontal, 3)
                     
-                    Text("\(viewmodel.temperatureC ?? "0")°C")
+                    Text("\(appSettings.setTemperature(temp: viewmodel.temperatureF ?? 0))")
                     
                     Text("|")
                         .padding(.horizontal, 3)
                     
-                    Text("Feels like: \(viewmodel.feelsLikeC ?? "0")°C")
+                    Text("Feels like: \(appSettings.setTemperature(temp: viewmodel.feelsLikeF ?? 0))")
                 }
                 .font(.callout)
                 .fontWeight(.semibold)
@@ -113,10 +114,12 @@ struct FadeOverlayView: View {
 }
 
 #Preview {
+    let appSettings = AppSettings()
     if let weatherResponse = Bundle.main.decode("MockWeatherResponse.json") as WeatherResponse? {
         WeatherHeaderView(
             progress: 1,
             viewmodel: WeatherInformationViewModel(weatherResponse: weatherResponse)
         )
+        .environment(appSettings)
     }
 }
