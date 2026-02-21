@@ -34,6 +34,8 @@ struct WelcomeView: View {
             
             policySection
                 .padding(.top, 8)
+            
+            Text("\(viewmodel.authorizationStatus)")
         }
         .sheet(isPresented: $viewmodel.showPopup) {
             RequestPermissionView(state: viewmodel.authorizationStatus, requestPermission: {
@@ -81,6 +83,7 @@ private var policySection: some View {
         }
         .font(.footnote)
         .foregroundColor(.secondary)
+        
     }
 
 }
@@ -125,17 +128,25 @@ class WelcomeViewModel {
             return
         }
         
+        guard let location = await realtimeManager.requestLocation() else {
+            return
+        }
+
+        
         showPopup = false
-        await saveCurrentLocation()
-        print("saveCurrentLocation")
+        await saveCurrentLocation(location)
+//        print("saveCurrentLocation")
         onFinished()
     }
     
-    private func saveCurrentLocation() async {
-        guard let response = realtimeManager.currentLocation else { return }
-        guard let location = try? await weatherManager.getCurrentLocation(lat: response.coordinate.latitude, lon: response.coordinate.longitude) else { return }
-        locationManager.addFavorites(location: location)
-        await weatherManager.loadWeather(locationId: location.id, lat: location.lat, lon: location.long)
+    private func saveCurrentLocation(_ location: CLLocation) async {
+        guard let response = try? await weatherManager.getCurrentLocation(
+            lat: location.coordinate.latitude,
+            lon: location.coordinate.longitude
+        ) else { return }
+        
+        locationManager.addFavorites(location: response)
+        await weatherManager.loadWeather(locationId: response.id, lat: response.lat, lon: response.long)
     }
 }
 

@@ -14,15 +14,22 @@ class RealTimeManager {
     
     private let service: LocationService
     
-    var authorizationStatus: CLAuthorizationStatus = .notDetermined
-    var currentLocation: CLLocation?
+//    var authorizationStatus: CLAuthorizationStatus = .notDetermined
+//    var currentLocation: CLLocation?
     
     
     init(service: LocationService) {
         self.service = service
         
-        self.authorizationStatus = service.authorizationStatus
-        self.currentLocation = service.currentLocation
+//        self.authorizationStatus = service.authorizationStatus
+//        self.currentLocation = service.currentLocation
+    }
+    var authorizationStatus: CLAuthorizationStatus {
+        service.authorizationStatus
+    }
+    
+    var currentLocation: CLLocation? {
+        service.currentLocation
     }
     
     func requestPermission() {
@@ -30,8 +37,8 @@ class RealTimeManager {
 
     }
     
-    func refreshLocation() {
-        service.requestLocation()
+    func requestLocation() async -> CLLocation? {
+        await service.requestLocation()
     }
 }
 
@@ -43,40 +50,32 @@ protocol LocationService: AnyObject{
     var currentLocation: CLLocation? { get }
     
     func requestPermission()
-    func requestLocation()
+    func requestLocation() async -> CLLocation?
 }
 
 @Observable
 final class MockRealTimeService: LocationService {
     
-    var authorizationStatus: CLAuthorizationStatus
-    var currentLocation: CLLocation?
-    
-    init(
-        authorizationStatus: CLAuthorizationStatus = .notDetermined,
-        currentLocation: CLLocation? = nil
-    ) {
-        self.authorizationStatus = authorizationStatus
-        self.currentLocation = currentLocation
-    }
-    
+    var authorizationStatus: CLAuthorizationStatus = .notDetermined
+    var currentLocation: CLLocation? = nil
     
     func requestPermission() {
-        authorizationStatus = .authorizedWhenInUse
+        authorizationStatus = .authorizedAlways
         currentLocation = CLLocation(latitude: 19.4326, longitude: -99.1332)
     }
     
-    func requestLocation() {
+    func requestLocation() async -> CLLocation? {
+        currentLocation
     }
 }
 
 
-import CoreLocation
 
 @Observable
 final class RealTimeService: NSObject, LocationService, @MainActor CLLocationManagerDelegate {
     
     private let manager = CLLocationManager()
+    private var locationContinuation: CheckedContinuation<CLLocation?, Never>?
     
     private(set) var authorizationStatus: CLAuthorizationStatus
     private(set) var currentLocation: CLLocation?
@@ -92,18 +91,21 @@ final class RealTimeService: NSObject, LocationService, @MainActor CLLocationMan
         manager.requestWhenInUseAuthorization()
     }
     
-    func requestLocation() {
-        manager.requestLocation()
+    func requestLocation() async -> CLLocation?{
+        await withCheckedContinuation { continuation in
+            self.locationContinuation = continuation
+            manager.requestLocation()
+        }
     }
     
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         Task { @MainActor in
             authorizationStatus = manager.authorizationStatus
             
-            if authorizationStatus == .authorizedWhenInUse ||
-                authorizationStatus == .authorizedAlways {
-                requestLocation()
-            }
+//            if authorizationStatus == .authorizedWhenInUse ||
+//                authorizationStatus == .authorizedAlways {
+//                await requestLocation()
+//            }
         }
     }
     
@@ -111,18 +113,18 @@ final class RealTimeService: NSObject, LocationService, @MainActor CLLocationMan
         _ manager: CLLocationManager,
         didUpdateLocations locations: [CLLocation]
     ) {
-        Task { @MainActor in
-            self.currentLocation = locations.first
-        }
+        let location = locations.first
+        currentLocation = location
+        
+        locationContinuation?.resume(returning: location)
+        locationContinuation = nil
     }
     
     func locationManager(
         _ manager: CLLocationManager,
         didFailWithError error: Error
     ) {
-        Task { @MainActor in
-            print("Location error:", error.localizedDescription)
-            self.currentLocation = nil
-        }
+        locationContinuation?.resume(returning: nil)
+        locationContinuation = nil
     }
 }
