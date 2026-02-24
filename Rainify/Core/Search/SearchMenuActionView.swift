@@ -42,9 +42,9 @@ struct SearchMenuActionView: View {
                 }
             } label: {
                 HStack {
-                    Text(appSettings.unit.rawValue.capitalized)
+                    Text(appSettings.temperatureUnit.rawValue.capitalized)
                     Spacer()
-                    Image(systemName: appSettings.unit == .celcius ? "degreesign.celsius" : "degreesign.fahrenheit")
+                    Image(systemName: appSettings.temperatureUnit == .celcius ? "degreesign.celsius" : "degreesign.fahrenheit")
                 }
                 .padding()
                 .background(.ultraThinMaterial)

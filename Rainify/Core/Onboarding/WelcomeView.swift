@@ -34,8 +34,6 @@ struct WelcomeView: View {
             
             policySection
                 .padding(.top, 8)
-            
-            Text("\(viewmodel.authorizationStatus)")
         }
         .sheet(isPresented: $viewmodel.showPopup) {
             RequestPermissionView(state: viewmodel.authorizationStatus, requestPermission: {

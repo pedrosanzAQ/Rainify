@@ -98,6 +98,7 @@ class AppState {
 extension UserDefaults {
     private struct Keys {
         static let showTabbarView = "showTabbarView"
+        static let temperatureUnit = "temperatureUnit"
     }
     
     static var showTabbarView: Bool {
@@ -106,6 +107,19 @@ extension UserDefaults {
         }
         set {
             standard.set(newValue, forKey: Keys.showTabbarView)
+        }
+    }
+    
+    static var temperatureUnit: TemperatureUnit {
+        get {
+            guard let rawValue = standard.string(forKey: Keys.temperatureUnit),
+                  let unit = TemperatureUnit(rawValue: rawValue) else {
+                return TemperatureUnit.fahrenheit
+            }
+            return unit
+        }
+        set {
+            standard.set(newValue.rawValue, forKey: Keys.temperatureUnit)
         }
     }
 }

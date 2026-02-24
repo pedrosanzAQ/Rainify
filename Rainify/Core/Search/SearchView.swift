@@ -345,7 +345,6 @@ struct SearchView: View {
     let container = DevPreview.shared.container
     let tabbarVM = TabbarViewModel(container: container)
     let appSettings = AppSettings()
-//    NavigationStack {
         SearchView(viewmodel: SearchViewModel(container: container))
             .onAppear {
                 Task {
@@ -353,7 +352,6 @@ struct SearchView: View {
                     await DevPreview.shared.locationManager.loadPersistenceLocations()
                 }
             }
-//    }
     .environment(tabbarVM)
     .environment(appSettings)
 }

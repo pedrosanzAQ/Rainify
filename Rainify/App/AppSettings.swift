@@ -13,17 +13,25 @@ enum TemperatureUnit: String {
 
 @Observable
 class AppSettings {
-    var unit: TemperatureUnit = .fahrenheit
+    private(set) var temperatureUnit: TemperatureUnit {
+        didSet {
+            UserDefaults.temperatureUnit = temperatureUnit
+        }
+    }
+    
+    init(temperatureUnit: TemperatureUnit = UserDefaults.temperatureUnit){
+        self.temperatureUnit = temperatureUnit
+    }
     
     func temperatureToggle() {
-        unit = unit == .celcius ? .fahrenheit : .celcius
+        temperatureUnit = temperatureUnit == .celcius ? .fahrenheit : .celcius
     }
     
     func setTemperature(temp: Double) -> String {
         // by defect temp is Fahrenheit
         let roundedTemp = temp.rounded()
         
-        if unit == .fahrenheit {
+        if temperatureUnit == .fahrenheit {
             return "\(Int(roundedTemp))°F"
         } else {
             let tempC = (temp - 32) * 5/9
@@ -35,7 +43,7 @@ class AppSettings {
         // by defect temp is Fahrenheit
         let roundedTemp = temp.rounded()
         
-        if unit == .fahrenheit {
+        if temperatureUnit == .fahrenheit {
             return Int(roundedTemp)
         } else {
             let tempC = (temp - 32) * 5/9
