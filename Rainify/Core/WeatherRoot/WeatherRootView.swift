@@ -4,48 +4,6 @@
 //
 //  Created by pedrosanz on 16/12/25.
 //
-
-import SwiftUI
-
-@Observable
-@MainActor
-class WeatherRootViewModel {
-    var locationsManager: LocationsPersistenceManager
-    var weatherManager: WeatherManager
-    var container: DependencyContainer
-    
-    private var didLoad = false
-    
-    init(container: DependencyContainer) {
-        self.locationsManager = container.resolve(LocationsPersistenceManager.self)!
-        self.weatherManager = container.resolve(WeatherManager.self)!
-        self.container = container
-    }
-
-    var favorites: [StoredLocation] {
-        locationsManager.favorites
-    }
-    
-    var weathers: [Int: CachedWeather] {
-        weatherManager.weatherCache
-    }
-    
-    func loadWeathers() async {
-        for favorite in favorites {
-            await weatherManager
-                .loadWeather(
-                    locationId: favorite.id,
-                    lat: favorite.lat,
-                    lon: favorite.long
-                )
-        }
-    }
-    
-    func weather(for locationId: Int) -> WeatherResponse? {
-        weatherManager.weatherCache[locationId]?.weather
-    }
-}
-
 import SwiftUI
 
 struct WeatherRootView: View {
@@ -72,12 +30,10 @@ struct WeatherRootView: View {
             await viewmodel.loadWeathers()
         }
         .onChange(of: viewmodel.favorites) {
-            // Si no hay selección aún, selecciona la primera/
             if tabbarViewModel.selectedLocationId == nil {
                 tabbarViewModel.selectedLocationId = viewmodel.favorites.first?.id
             }
             
-            // Si borraron la ciudad actual, ajusta selección
             if let selectedId = tabbarViewModel.selectedLocationId,
                !viewmodel.favorites.contains(where: { $0.id == selectedId }) {
                 tabbarViewModel.selectedLocationId = viewmodel.favorites.first?.id
@@ -156,7 +112,6 @@ private extension WeatherRootView {
                 Spacer()
                 
                 VStack(spacing: 8){
-                    //                    Text("No favorites location added")
                     Text("There are no favorite locations")
                         .font(.title2)
                         .fontWeight(.semibold)
@@ -180,8 +135,7 @@ private extension WeatherRootView {
                 }
                 
                 Button {
-                    // Aquí pones la lógica para mostrar tu SearchView
-                    // Ejemplo: isShowingSearch = true
+                    tabbarViewModel.selectedTab = .search
                 } label: {
                     Text("Find a location")
                         .font(.subheadline)
@@ -200,6 +154,7 @@ private extension WeatherRootView {
 #Preview {
     let container = DevPreview.shared.container
     let tabbarVM = TabbarViewModel(container: container)
+    let appSettings = AppSettings()
     NavigationStack {
         WeatherRootView(viewmodel: WeatherRootViewModel(container: container))
             .onAppear {
@@ -208,7 +163,7 @@ private extension WeatherRootView {
                     await DevPreview.shared.locationManager.loadPersistenceLocations()
                 }
             }
+            .environment(tabbarVM)
+            .environment(appSettings)
     }
-    .environment(tabbarVM)
-
 }

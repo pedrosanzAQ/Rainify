@@ -17,18 +17,13 @@ struct MoonShape: View {
                 .scaledToFit()
                 .clipShape(RoundedRectangle(cornerRadius: 12))
                 .shadow(radius: 10)
-                .brightness(0.036) // 0.1 a 0.3 es ideal
-//                .frame(width: 180, height: 190)
+                .brightness(0.036)
         }
     }
 }
 
 
 #Preview {
-//    @Previewable @State var phases: String = "Full Moon"
-//    @Previewable @State var phases: String = "Waning Crescent"
-//    @Previewable @State var phases: String = "last quarter"
-//    @Previewable @State var phases: String = "new moon"
     @Previewable var phases: String = "Waxing gibbous"
     MoonShape(phase: phases)
 }

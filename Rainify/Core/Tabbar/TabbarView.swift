@@ -18,9 +18,8 @@ struct TabbarView: View {
             .tabItem ({ Image(systemName: "smoke") })
             .tag(TypeBar.weather)
             
-//            NavigationStack {
-                SearchView(viewmodel: SearchViewModel(container: viewmodel.container))
-//            }
+            // has navigationStack inside of it 
+            SearchView(viewmodel: SearchViewModel(container: viewmodel.container))
             .tabItem ({ Image(systemName: "magnifyingglass") })
             .tag(TypeBar.search)
         }
@@ -28,24 +27,9 @@ struct TabbarView: View {
     }
 }
 
-@Observable
-@MainActor
-class TabbarViewModel {
-    var selectedTab: TypeBar = .weather
-    var selectedLocationId: Int? = nil
-    let container: DependencyContainer
-    
-    init(container: DependencyContainer) {
-        self.container = container
-    }
-}
-
-enum TypeBar {
-    case weather
-    case search
-}
-
 #Preview {
+    let appSettings = AppSettings()
     TabbarView(viewmodel: TabbarViewModel(container: DevPreview.shared.container))
+        .environment(appSettings)
 }
 

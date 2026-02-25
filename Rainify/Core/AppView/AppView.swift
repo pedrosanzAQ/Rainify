@@ -5,8 +5,6 @@
 //  Created by pedrosanz on 16/06/25.
 //
 
-// RAIZ
-
 import SwiftUI
 
 struct AppView: View {

@@ -7,59 +7,6 @@
 
 import SwiftUI
 
-class PressureGaugeViewModel {
-    private var weather: Current?
-    
-    init(weather: Current?) {
-        self.weather = weather
-    }
-    
-    let startAngle: Double = -135
-    let endAngle: Double = 135
-    let tickCount: Int = 22
-    let radius: CGFloat = 55
-    
-    // In
-    let minPressure: Double = 25.70
-    let maxPressure: Double = 32.03
-    
-    // Mb
-//    let minPressure: Double = 870
-//    let maxPressure: Double = 1085
-    
-    var hasData: Bool {
-        return weather != nil
-    }
-    
-    var pressure: Double? {
-        return weather?.pressureIn.rounded()
-    }
-    
-    func getAnglePressure() -> Double {
-        let minAngle: Double = -45
-        let maxAngle: Double = 225
-        
-        guard let pressure else { return 0 }
-        
-        let progress = (pressure - minPressure) / (maxPressure - minPressure)
-        
-        let anglePressure = minAngle + progress * (maxAngle - (minAngle))
-        
-        return anglePressure
-    }
-    
-    // Offset de una etiqueta en un círculo
-    func getOffset(for angle: Double, distance: CGFloat) -> CGSize {
-        let radians = angle * .pi / 180
-        let dx = cos(radians) * distance
-        let dy = sin(radians) * distance
-        return CGSize(width: dx, height: dy)
-    }
-    
-//    func pressureDescription()
-
-}
-
 struct PressureGaugeView: View {
     var viewmodel: PressureGaugeViewModel
 
@@ -67,22 +14,18 @@ struct PressureGaugeView: View {
         ContentBoxView(title: "Pressure"){
             if viewmodel.hasData {
                 ZStack {
-                    // move this logic to the service or viewModel
                     let angle = viewmodel.getAnglePressure()
                     
-                    // Arco base
                     Circle()
                         .trim(from: 0.25, to: 0.75)
                         .stroke(Color.gray.opacity(0), lineWidth: 15)
                         .frame(width: viewmodel.radius * 2, height: viewmodel.radius * 2)
                     
-                    // Rayitas del arco
                     ForEach(0..<viewmodel.tickCount, id: \.self) { index in
                         let angle = Angle(degrees: viewmodel.startAngle + (Double(index) / Double(viewmodel.tickCount - 1)) * (viewmodel.endAngle - viewmodel.startAngle))
                         TickMark(angle: angle, radius: viewmodel.radius)
                     }
                     
-                    // Etiquetas LOW y HIGH usando offset
                     Text("Low")
                         .font(.footnote)
                         .foregroundColor(.blue)
@@ -96,15 +39,12 @@ struct PressureGaugeView: View {
                     VStack(spacing: 1){
                         Text("\(String(format: "%.1f", viewmodel.pressure ?? 0))") //mb or inHg
                         
-                        // ES mb, EN inHg
                         Text("inHg")
                     }
                     .font(.footnote)
                     .foregroundColor(.primary)
-                    .offset(x: -viewmodel.radius * 0.85) // ajusta la distancia según te guste
+                    .offset(x: -viewmodel.radius * 0.85)
                     
-                    
-                    // Aguja tipo flecha
                     NeedleWithValue(angle: angle, pressure: viewmodel.pressure ?? 0, radius: viewmodel.radius)
                     
                 }
@@ -126,13 +66,11 @@ struct ArrowWithSemiBase: Shape {
         _ = rect.height - triangleHeight
         let centerX = rect.midX
 
-        // Triángulo superior (punta de flecha)
-        path.move(to: CGPoint(x: centerX, y: 0)) // punta
+        path.move(to: CGPoint(x: centerX, y: 0))
         path.addLine(to: CGPoint(x: centerX + rect.width / 2, y: triangleHeight))
         path.addLine(to: CGPoint(x: centerX - rect.width / 2, y: triangleHeight))
         path.closeSubpath()
 
-        // Semicírculo en la base
         path.addArc(
             center: CGPoint(x: centerX, y: triangleHeight),
             radius: rect.width / 2,
@@ -162,10 +100,6 @@ struct NeedleWithValue: View {
     }
 }
 
-
-
-
-// Ticks individuales del arco
 struct TickMark: View {
     let angle: Angle
     let radius: CGFloat

@@ -20,13 +20,9 @@ struct CompassDraw: View {
     
     private let labeledPoints: [(label: String, angle: Double)] = [
         ("N", 0),
-//        ("NE", 45),
         ("E", 90),
-//        ("SE", 135),
         ("S", 180),
-//        ("SW", 225),
         ("W", 270)
-//        ("NW", 315)
     ]
 
     var body: some View {
@@ -42,12 +38,10 @@ struct CompassDraw: View {
                     )
                 }
                 
-                // Grado en los ticks grandes
                 ForEach(largeTicks, id: \.self) { degree in
                     CompassDegreeLabel(degree: degree, radius: radiusCompass ?? 100, offset: 20)
                 }
                 
-                // Direcciones cardinales principales
                 ForEach(labeledPoints, id: \.label) { point in
                     CompassTextLabel(
                         text: point.label,
@@ -58,7 +52,6 @@ struct CompassDraw: View {
                     )
                 }
                 
-                // Flecha roja
                 ArrowTriangle()
                     .fill(Color.red)
                     .frame(width: arrowWidth, height: arrowHeight)
@@ -70,8 +63,8 @@ struct CompassDraw: View {
 
     func tickLength(for degree: Int) -> CGFloat {
         let big: CGFloat = 12
-        let medium = big * 0.8       // 9.6
-        let small = medium * 0.5     // 4.8
+        let medium = big * 0.8
+        let small = medium * 0.5   
 
         if degree % 30 == 0 {
             return big

@@ -6,87 +6,6 @@
 //
 import SwiftUI
 
-@Observable
-@MainActor
-class LocationViewModel {
-    private(set) var weatherResponse: WeatherResponse?
-    private let locationsManager: LocationsPersistenceManager
-    private var location: StoredLocation
-    
-//    var isPin: Bool = true
-    var topSafeArea: CGFloat = 59
-    
-    init(location: StoredLocation, weather: WeatherResponse?, container: DependencyContainer) {
-        self.weatherResponse = weather
-        self.location = location
-        self.locationsManager = container.resolve(LocationsPersistenceManager.self)!
-        
-    }
-    
-    var isPinned: Bool {
-        locationsManager.favorites.contains(where: { $0.id == location.id })
-    }
-    
-    var hasData: Bool {
-        return weatherResponse != nil
-    }
-    
-    var forecastday: [Forecastday]? {
-        return weatherResponse?.forecast.forecastday
-    }
-    
-    var current: Current? {
-        return weatherResponse?.current
-    }
-    
-    var weather: WeatherResponse? {
-        return self.weatherResponse
-    }
-    
-    // MARK: -- ACCESS VARIABLES
-    
-    var locationName: String? {
-        return weatherResponse?.location.name
-    }
-    
-    var condition: String? {
-        return weatherResponse?.current.condition.text
-    }
-    
-//    var temperatureC: String? {
-//        guard let temp = weatherResponse?.current.tempC else { return nil }
-//        return String(Int(temp.rounded()))
-//    }
-    
-    var humidity: Int? {
-        return weatherResponse?.current.humidity
-    }
-    
-//    var feelsLikeC: String? {
-//        guard let feelsLike = weatherResponse?.current.feelslikeC else { return nil}
-//        return String(Int(feelsLike.rounded()))
-//    }
-    
-//    var lowTemperatureC: String?{
-//        guard let minTemp = weatherResponse?.forecast.forecastday.first?.day.mintempC else { return nil}
-//        return String(Int(minTemp.rounded()))
-//    }
-    
-//    var highTemperatureC: String? {
-//        guard let maxTemp = weatherResponse?.forecast.forecastday.first?.day.maxtempC else { return nil}
-//        return String(Int(maxTemp.rounded()))
-//    }
-//    
-    func toggleFavorite() {
-        if isPinned {
-            locationsManager.removeFavorites(location: location)
-        } else {
-            locationsManager.addFavorites(location: location)
-        }
-    }
-
-}
-
 // keywords C679DD
 struct LocationView: View {
     @Environment(\.safeAreaInsets) var safeArea
@@ -150,7 +69,6 @@ struct LocationView: View {
                             
                             DailyForecastView(viewmodel: DailyForecastViewModel(forecastday: viewmodel.forecastday ?? []))
                             
-                            // control + m amarillo defecto C8A26C
                             AirConditionBarView(viewmodel: AirConditionViewModel(weather: viewmodel.current))
                             
                             HStack(spacing: 16){
@@ -160,10 +78,8 @@ struct LocationView: View {
                             }
                             .frame(height: 180)
                             
-                            UVConditionView(viewmodel: UVConditionVieModel(weather: viewmodel.current))
+                            UVConditionView(viewmodel: UVConditionViewModel(weather: viewmodel.current))
                             
-                            // visble pero prespetuoso el hijo E0CFA0
-                            // sutil EFE4C6
                             HStack(spacing: 16){
                                 WindConditionView(viewmodel: WindConditionViewModel(current: viewmodel.current))
                                     .frame(height: 340)
@@ -174,13 +90,11 @@ struct LocationView: View {
                                 }
                                 .frame(maxWidth: .infinity)
                             }
-                            // last view
                             AstroConditionView(viewmodel: AstroConditionViewModel(forecastdays: viewmodel.forecastday ?? []))
                         }
                         .padding(.horizontal)
                         .padding(.bottom, 100)
                     }
-//                    .padding(.top, 80)
                 }
                 
             }
@@ -205,23 +119,17 @@ struct LocationView: View {
                         .padding(.top, safeArea.top)
                         .transition(.move(edge: .top).combined(with: .opacity))
                         .animation(.easeInOut(duration: 0.4), value: headerProgress)
-                        //                    .clipped()
                         .zIndex(3)
                     }
                 }
             }
         }
-//        .padding(.top, 59)  // QUITAR
         .ignoresSafeArea()
         .task {
             self.clouds = CloudScenes()
         }
-        .task {
-//            await viewmodel.loadWeather()
-        }
     }
 
-    // Fade aparece más rápido
         private var fadeProgress: Double {
             let start: CGFloat = 0
             let end: CGFloat = (-82 + safeArea.top)
@@ -229,7 +137,6 @@ struct LocationView: View {
             return max(0, min(1, Double(raw)))
         }
 
-        // Header aparece un poco más abajo
         private var headerProgress: Double {
             let start: CGFloat = 0
             let end: CGFloat = (-82 + safeArea.top)
@@ -238,9 +145,6 @@ struct LocationView: View {
         }
 
 }
-
-// 9A6CFF
-// 9F7CEA morado actual
 
 #Preview ("Data"){
     let appSettings = AppSettings()

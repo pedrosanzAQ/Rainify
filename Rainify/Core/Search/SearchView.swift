@@ -38,7 +38,6 @@ class SearchViewModel {
     }
     
     func onSearchTextChanged(){
-        // Cancel any search before if the user is typing
         searchTask?.cancel()
         
         guard searchText.count > 2 else {

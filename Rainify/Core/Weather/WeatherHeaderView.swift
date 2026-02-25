@@ -8,8 +8,6 @@
 import SwiftUI
 import SpriteKit
 
-// var voewmodel: WeatherInformationViewModel
-
 struct WeatherHeaderView: View {
     @Environment(AppSettings.self) private var appSettings
     let progress: Double
@@ -38,8 +36,6 @@ struct WeatherHeaderView: View {
                 }
                 .font(.callout)
                 .fontWeight(.semibold)
-//                .offset(x: animateIn ? 0 : 40)
-//                .opacity(animateIn ? 1 : 0)
             }
             .padding(.bottom, 4)
             .offset(y: animateIn ? 0 : -20)
@@ -49,7 +45,6 @@ struct WeatherHeaderView: View {
         .frame(maxWidth: .infinity)
         .shadow(radius: 0.5)
         .onAppear {
-            // Delay leve para que el layout se estabilice
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.04) {
                 withAnimation(.spring) {
                     animateIn = true
@@ -93,20 +88,17 @@ struct FadeOverlayView: View {
     var gradientColors: [Color] {
         if colorScheme == .dark {
             return [
-//                Color.black.opacity(0.2), // más claro arriba
-                Color.black.opacity(0.4), // más oscuro abajo
-                Color.black.opacity(0.6), // más oscuro abajo
-                Color.black.opacity(0.8), // más oscuro abajo
-//                Color.black                // opaco abajo
+                Color.black.opacity(0.4),
+                Color.black.opacity(0.6),
+                Color.black.opacity(0.8),
             ]
         } else {
             return [
-                Color.white.opacity(0.2), // más claro arriba
-                Color.white.opacity(0.4), // más oscuro abajo
+                Color.white.opacity(0.2),
+                Color.white.opacity(0.4),
                 Color.white.opacity(0.6),
                 Color.white.opacity(0.8),
                 Color.white.opacity(0.9),
-//                Color.white                // opaco abajo
             ]
         }
     }

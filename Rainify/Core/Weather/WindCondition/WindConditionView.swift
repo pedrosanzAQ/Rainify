@@ -7,45 +7,6 @@
 
 import SwiftUI
 
-// 17181C
-
-class WindConditionViewModel {
-    var current: Current?
-    private var isEn: Bool?
-    
-    init(current: Current?) {
-        self.current = current
-    }
-    
-    var windSpeed: String? {
-        guard let current else { return nil }
-        return (isEn ?? true)
-            ? String(format: "%.2f Mi/h", current.windMph)
-            : String(format: "%.2f Km/h", current.windKph)
-    }
-    
-    var gusts: String? {
-        guard let current else { return nil}
-        return (isEn ?? true)
-            ? String(format: "%.2f Mi/h", current.gustMph)
-            : String(format: "%.2f Km/h", current.gustKph)
-    }
-    
-    var windDirection: String? {
-        let dir = current?.windDir
-        if isEn ?? true { return dir }
-        
-        return dir?
-            .replacingOccurrences(of: "W", with: "O")
-            .replacingOccurrences(of: "w", with: "o")
-    }
-    
-    var windDegress: Int? {
-        return current?.windDegree
-    }
-}
-// E5C17C
-
 struct WindConditionView: View {
     var viewmodel: WindConditionViewModel
     
@@ -53,7 +14,6 @@ struct WindConditionView: View {
         ContentBoxView(title: "Wind") {
             VStack(spacing: 8){
                 CompassDraw(direction: viewmodel.windDegress ?? 0)
-//                    .background(Color.green)
                     .frame(width: 165)
                 
                 if viewmodel.current != nil {
@@ -98,7 +58,6 @@ struct WindConditionView: View {
                 }
             }
             .frame(maxHeight: .infinity)
-//            .padding(4)
         }
     }
 }
@@ -116,9 +75,3 @@ struct WindConditionView: View {
     .frame(width: 200, height: 350)
 
 }
-
-
-// AMARILLO - DORADO:   D6B86F
-// Rosa:                E6A6C7
-// DFA1BE
-
